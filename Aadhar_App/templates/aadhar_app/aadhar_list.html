@@ -1,0 +1,50 @@
+{% extends 'aadhar_app/base.html' %}
+{% block title %}Aadhar Profile{% endblock %}
+{% block content %}
+{% block extra_css %}
+<style>
+.a-card{
+  background:#fff;
+  border-radius:14px;
+  padding:24px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+.a-title{
+  text-align:center;
+  color:#1f3c88;
+  font-weight:600;
+  margin-bottom:20px;
+}
+.page-pad{padding:0 16px;}
+@media(max-width:576px){
+  .a-card{padding:18px;}
+}
+</style>
+{% endblock %}
+
+
+<div class="container page-pad mt-4">
+ <div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8 col-sm-12">
+   <div class="a-card text-center">
+
+    <h4 class="a-title">{{ a.name }}</h4>
+    <p class="text-muted">{{ a.aadhar_no }}</p>
+
+    {% if a.photo %}
+      <img src="{{ a.photo.url }}" class="img-fluid rounded mb-3" width="180">
+    {% endif %}
+
+    <p><b>Mobile:</b> {{ a.mobile }}</p>
+    <p><b>DOB:</b> {{ a.dob }}</p>
+    <p><b>Address:</b> {{ a.address }}</p>
+
+    <a href="{% url 'aadhar_edit' a.pk %}" class="btn btn-primary w-100 mt-3">
+      Edit Aadhar
+    </a>
+
+   </div>
+  </div>
+ </div>
+</div>
+{% endblock %}

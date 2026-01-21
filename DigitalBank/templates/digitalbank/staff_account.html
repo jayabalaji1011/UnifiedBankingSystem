@@ -1,0 +1,128 @@
+{% extends 'digitalbank/index.html' %}
+{% load static %}
+{% block title %}
+My Account
+{% endblock title %}
+{% block content %}
+{% block extra_css %}
+<style>
+    .card {
+        margin-top: 150px;
+        border-radius: 12px;
+    }
+
+    @media (max-width: 576px) {
+        .card {
+            margin: 1rem;
+            margin-top: 150px;
+        }
+    }
+
+    .form-message-container {
+        position: fixed;
+        top: 90%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1050;
+        width: auto;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    .form-message {
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-weight: 500;
+        color: #fff;
+        margin-bottom: 10px;
+        opacity: 1;
+        transition: opacity 0.5s;
+    }
+
+    .form-message.success {
+        background-color: #28a745;
+    }
+
+    .form-message.error {
+        background-color: #dc3545;
+    }
+</style>
+{% endblock extra_css %}
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white text-center">
+                    <h4>My Account</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Message popup -->
+                    {% if messages %}
+                    <div class="form-message-container">
+                        {% for message in messages %}
+                        <div class="form-message {{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <form method="post" action="{% url 'digitalbank:staff_account' %}" id="accountForm">
+                        {% csrf_token %}
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label for="name">Name</label>
+                            <input type="text" id="username" name="username" class="form-control" value="{{ staff.username }}"
+                                disabled>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-control"
+                                placeholder="*****" readonly>
+                        </div>
+
+                        <!-- Buttons -->
+                        <button type="button" class="btn btn-success w-100 mt-2" id="editBtn">Edit</button>
+                        <button type="submit" class="btn btn-primary w-100 mt-2 d-none" id="saveBtn">Save
+                            Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById("accountForm");
+    const inputs = form.querySelectorAll("input");
+    const editBtn = document.getElementById("editBtn");
+    const saveBtn = document.getElementById("saveBtn");
+
+    // Disable inputs by default
+    inputs.forEach(input => input.setAttribute("disabled", true));
+
+    // Enable fields when clicking Edit
+    editBtn.addEventListener("click", function () {
+        inputs.forEach(input => input.removeAttribute("disabled"));
+        editBtn.classList.add("d-none");
+        saveBtn.classList.remove("d-none");
+    });
+
+    //Messages
+   document.addEventListener("DOMContentLoaded", function () {
+    const successMsgs = document.querySelectorAll('.form-message.success');
+    successMsgs.forEach(msg => {
+      // Optional: fade out
+      setTimeout(() => {
+        msg.style.transition = 'opacity 0.5s';
+        msg.style.opacity = '0';
+        setTimeout(() => { msg.style.display = 'none'; }, 500);
+      }, 2000); 
+    });
+  });
+</script>
+{% endblock content %}

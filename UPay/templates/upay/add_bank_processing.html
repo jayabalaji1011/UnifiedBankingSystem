@@ -1,0 +1,127 @@
+{% extends 'upay/index.html' %}
+{% block title %}Checking Bank{% endblock %}
+{% block content %}
+{% block extra_css %}
+<style>
+.bank-process-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  text-align: center;
+}
+
+/* spinner circle */
+.spinner {
+  width: 80px;
+  height: 80px;
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #0d6efd;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+
+.process-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  min-height: 24px;
+  margin-bottom: 10px;
+}
+
+.process-step {
+  margin-top: 5px;
+  font-size: 16px;
+  color: #555;
+}
+
+/* mobile */
+@media(max-width:480px){
+  .spinner { width:60px; height:60px; border-width:6px; }
+  .process-text{ font-size:16px; }
+  .process-step { font-size:14px; }
+}
+</style>
+{% endblock extra_css %}
+
+
+<div class="bank-process-page">
+    <div class="spinner"></div>
+    <div class="process-text" id="processText">Starting verification...</div>
+    <div class="process-step" id="processStep"></div>
+</div>
+
+<script>
+const steps = [
+  "Starting verification...",
+  "Fetching your bank details...",
+  "Checking mobile and Bank...",
+  "Verifying your account information...",
+  "Redirect to Bank verify..."
+];
+
+const processText = document.getElementById("processText");
+// Remove step number display
+// const processStep = document.getElementById("processStep");
+
+let stepIndex = 0;
+let totalSteps = steps.length;
+
+// Total animation duration ~10s → ~2s per step
+let stepDuration = 2000;
+let maxTime = 20000; // 20 seconds max timeout
+let startTime = Date.now();
+
+function showStep() {
+    if(stepIndex < totalSteps){
+        processText.textContent = steps[stepIndex];
+        // No step number
+        // processStep.textContent = `Step ${stepIndex+1} of ${totalSteps}`;
+        stepIndex++;
+        setTimeout(showStep, stepDuration);
+    } else {
+        // Steps finished → backend check
+        checkBackend();
+    }
+}
+
+showStep(); // start animation
+
+function checkBackend(){
+    fetch("{% url 'add_bank_processing_check' %}")
+    .then(res => res.json())
+    .then(data => {
+        if(data.redirect){
+            window.location.href = data.redirect;
+        } else {
+            // If backend not ready, retry after 1s
+            if(Date.now() - startTime < maxTime){
+                setTimeout(checkBackend, 1000);
+            } else {
+                // Max time reached → fallback
+                window.location.href = "{% url 'add_bank' %}";
+            }
+        }
+    })
+    .catch(err=>{
+        // If network/server error → redirect to select bank page
+        window.location.href = "{% url 'add_bank' %}";
+    });
+}
+
+// Safety timeout: force redirect if something goes wrong
+setTimeout(()=>{
+    window.location.href = "{% url 'add_bank' %}";
+}, maxTime);
+
+</script>
+
+{% endblock %}

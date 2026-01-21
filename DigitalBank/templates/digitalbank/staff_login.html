@@ -1,0 +1,98 @@
+{% extends 'digitalbank/index.html' %}
+{% load static %}
+{% block title %}
+Login
+{% endblock title %}
+{% block content %}
+{% block extra_css %}
+
+<style>
+  .card {
+    margin-top: 150px;
+    border-radius: 12px;
+  }
+
+  @media (max-width: 576px) {
+    .card {
+      margin: 1rem;
+      margin-top: 150px;
+    }
+  }
+
+    /* Message */
+    .form-message-container {
+        min-height: 24px;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+
+    .form-message {
+        font-weight: 500;
+    }
+
+    .form-message.error {
+        color: #dc3545;
+    }
+
+    .form-message.success {
+        color: #28a745;
+    }
+
+</style>
+
+{% endblock extra_css %}
+
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-5 col-12">
+      <div class="card shadow-lg">
+        <div class="card-header bg-success text-white text-center">
+          <h4>Login</h4>
+        </div>
+        <div class="card-body">
+
+          <!-- messages -->
+          <div class="form-message-container">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="form-message {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+              {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+          </div>
+
+          <form method="post" action="{% url 'digitalbank:staff_login' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              {{ form.username.label_tag }}
+              {{ form.username }}
+            </div>
+            <div class="mb-3">
+              {{ form.password.label_tag }}
+              {{ form.password }}
+            </div>
+            <button type="submit" class="btn btn-success w-100 mt-2">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const successMsgs = document.querySelectorAll('.form-message.success');
+    successMsgs.forEach(msg => {
+      setTimeout(() => {
+        msg.style.transition = 'opacity 0.5s';
+        msg.style.opacity = '0';
+        setTimeout(() => { msg.style.display = 'none'; }, 500);
+      }, 2000);
+    });
+  });
+</script>
+
+{% endblock content %}

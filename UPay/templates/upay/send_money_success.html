@@ -1,0 +1,113 @@
+{% extends 'upay/index.html' %}
+{% load static %}
+{% block title %}Payment Successful{% endblock %}
+{% block content %}
+<style>
+  /* Container & card styling */
+  .container {
+    margin: 8.5% auto;
+    margin-bottom:5%;
+    max-width: 480px;
+    padding: 0 15px;
+  }
+
+  .success-card {
+    background: #ffffff;
+    padding: 30px 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  /* Icons */
+  .success-icon {
+    font-size: 60px;
+    color: #28a745;
+    margin-bottom: 15px;
+  }
+
+  /* Receiver info */
+  .receiver-info {
+    text-align: left;
+    margin-top: 20px;
+  }
+
+  .receiver-info div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .receiver-info i {
+    font-size: 20px;
+    margin-right: 12px;
+    color: #0d6efd;
+    width: 25px;
+    text-align: center;
+  }
+
+  .receiver-info span {
+    font-weight: 500;
+    word-break: break-word;
+  }
+
+  /* Buttons */
+  .btn-home {
+    margin-top: 25px;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .success-card { padding: 25px 15px; 
+    margin-top:23%;
+    }
+    .success-icon { font-size: 50px; }
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+
+</style>
+
+<div class="container">
+
+  <!-- Success Card -->
+  <div class="success-card">
+    <i class="success-icon">&#10004;</i> <!-- checkmark icon -->
+    <h2>Payment Successful!</h2>
+    <p class="text-muted mt-2">Your transaction has been completed successfully.</p>
+
+    <!-- Receiver Info -->
+    <div class="receiver-info">
+      <div>
+         <i class="fa-solid fa-user"></i>
+        <span>Name: {{ receiver.name }}</span>
+      </div>
+      <div>
+        <i class="fa-solid fa-id-card"></i>
+        <span>Reciever_No: {{ recipient_input }}</span>
+      </div>
+      <div>
+        <i class="fa-solid fa-indian-rupee-sign"></i>
+        <span>Amount: ₹{{ amount }}</span>
+      </div>
+    </div>
+
+    <!-- Home Button -->
+    <a href="{% url 'home' %}" class="btn btn-primary btn-home">Go to Home</a>
+  </div>
+</div>
+
+
+<!-- Load FontAwesome for icons -->
+
+{% endblock %}

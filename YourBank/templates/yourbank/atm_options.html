@@ -1,0 +1,37 @@
+{% extends "yourbank/base.html" %}
+{% load static %}
+{% block content %}
+{% block extra_css %}
+<style>
+
+</style>
+{% endblock extra_css %}
+<div class="atm-wrapper">
+    <div class="atm-card">
+<a href="{% url 'yourbank:atm_home' %}" class="atm-close">✕</a>
+
+        <div class="atm-title">💳 ATM Card</div>
+
+        <div style="text-align:center; margin-bottom:20px;">
+            <p style="font-size:18px;">Welcome</p>
+            <p style="color:#22d3ee; font-size:20px; font-weight:bold;">
+                {{ card.customer.name }}
+            </p>
+            <p style="font-size:14px;">
+                Card: **** **** **** {{ card.card_no|slice:"-4:" }}
+            </p>
+        </div>
+
+        <div style="display:grid; gap:15px;">
+            <a href="{% url 'yourbank:atm_request_otp' %}" class="atm-btn" style="text-decoration:none;">
+                🔑 Set / Change ATM PIN
+            </a>
+
+            <a href="{% url 'yourbank:atm_home' %}" class="atm-btn" style="background:#ef4444;">
+                ❌ Cancel
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

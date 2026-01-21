@@ -1,0 +1,217 @@
+{% extends 'upay/index.html' %}
+{% block title %}Select Bank{% endblock %}
+{% block content %}
+{% block extra_css %}
+<style>
+/* page */
+.bank-page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+}
+
+
+/* main card */
+.card{
+  width:100%;
+  max-width:900px;
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.08);
+  margin:auto;
+  background: linear-gradient(to right, #0f2027, #2c5364) ! important;
+  color:white ! important;
+}
+
+
+/* title */
+.bank-title{
+  text-align:center;
+  font-size:22px;
+  font-weight:600;
+}
+.bank-sub{
+  text-align:center;
+  color:#777;
+  font-size:14px;
+  margin-bottom:20px;
+}
+
+.bank-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+  gap:18px;
+  justify-content:center;
+}
+
+/* Force real centering on large screens */
+@media(min-width:1024px){
+  .bank-grid{
+    max-width:800px;
+    margin:0 auto;   /* centers whole grid block */
+  }
+ 
+}
+
+@media(max-width:1023px){
+
+  .bank-grid{ grid-template-columns:repeat(2,1fr); }
+
+ 
+}
+
+/* bank box */
+.bank-item{
+  border:1px solid #ddd;
+  border-radius:14px;
+  padding:18px;
+  text-align:center;
+  cursor:pointer;
+  transition:.2s;
+  background:#fafafa;
+  color:#2c5364 ! important;
+}
+
+.bank-item:hover{
+  border-color:#0d6efd;
+  background:#f0f5ff;
+}
+
+.bank-item.active{
+  border:2px solid #0d6efd;
+  background:#e7f0ff;
+}
+
+/* logo */
+.bank-logo{
+  font-size:28px;
+}
+.bank-name{
+  margin-top:8px;
+  font-weight:600;
+  font-size:15px;
+}
+
+/* button */
+.bank-btn{
+  width:100%;
+  margin-top:25px;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#0d6efd;
+  color:#fff;
+  font-size:17px;
+  font-weight:600;
+  opacity:.5;
+}
+.bank-btn:enabled{
+  opacity:1;
+}
+
+
+.form-message-container {
+  position: fixed;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050;
+
+  width: calc(100% - 30px);   /* 🔥 allow wide messages */
+  max-width: 340px;           /* desktop limit */
+  text-align: center;
+}
+
+.form-message{
+  padding:10px 14px;
+  border-radius:8px;
+  font-weight:500;
+  color:#fff;
+
+  word-wrap: break-word;
+  white-space: normal;        /* 🔥 allow multiline */
+  line-height:1.4;
+}
+
+
+  .form-message.success { background-color: #28a745; }
+  .form-message.error { background-color: #dc3545; }
+</style>
+{% endblock extra_css %}
+<div class="bank-page">
+
+  <!-- Message popup -->
+    <div class="form-message-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="form-message {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+ 
+
+  <div class="card">
+
+    <h3 class="bank-title">Link Bank Account</h3>
+    <p class="bank-sub">Choose your bank to continue</p>
+
+    <form method="POST" id="bankForm">
+      {% csrf_token %}
+      <input type="hidden" name="bank" id="selectedBank">
+
+      <div class="bank-grid">
+        {% for bank in banks %}
+          <div class="bank-item" onclick="selectBank('{{ bank }}', this)">
+            <div class="bank-logo">🏦</div>
+            <div class="bank-name">{{ bank }}</div>
+          </div>
+        {% endfor %}
+      </div>
+
+
+      <button type="submit" class="bank-btn" disabled id="continueBtn">
+        Continue
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+<script>
+function selectBank(bank, el){
+  document.getElementById("selectedBank").value = bank;
+  document.getElementById("continueBtn").disabled = false;
+
+  document.querySelectorAll(".bank-item").forEach(i=>i.classList.remove("active"));
+  el.classList.add("active");
+}
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const successMsgs = document.querySelectorAll('.form-message.success');
+    const errorMsgs = document.querySelectorAll('.form-message.error');
+
+    successMsgs.forEach(msg => {
+      setTimeout(() => {
+        msg.style.transition = 'opacity 0.5s';
+        msg.style.opacity = '0';
+        setTimeout(() => { msg.style.display = 'none'; }, 500);
+      }, 2000);
+    });
+
+    errorMsgs.forEach(msg => {
+      setTimeout(() => {
+        msg.style.transition = 'opacity 0.5s';
+        msg.style.opacity = '0';
+        setTimeout(() => { msg.style.display = 'none'; }, 500);
+      }, 4000);
+    });
+  });
+</script>
+
+{% endblock %}

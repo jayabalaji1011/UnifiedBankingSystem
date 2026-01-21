@@ -1,0 +1,42 @@
+{% extends 'upay/index.html' %}
+{% load static %}
+{% block title %}Select Receiver{% endblock title %}
+{% block content %}
+<style>
+  .container { margin: 15% auto; max-width: 480px; padding: 0 15px; }
+  .card { padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align:center; }
+  .btn-action { width: 100%; padding: 12px; border-radius: 12px; margin-top: 15px; font-size:16px; }
+  .form-check { margin: 10px 0; text-align:left; }
+</style>
+
+<div class="container">
+  <div class="card">
+    <h2>Select Receiver</h2>
+    <p>Multiple accounts found. Select the correct receiver:</p>
+
+    <form method="post" action="{% url 'select_receiver' %}">
+      {% csrf_token %}
+
+      {% for bank, customers in candidates.items %}
+        {% for cust in customers %}
+          <div class="form-check">
+            <input class="form-check-input"
+                   type="radio"
+                   name="selected"
+                   value="{{ bank }}|{{ cust.customer_id }}"
+                   id="r{{ bank }}{{ cust.customer_id }}">
+
+            <label class="form-check-label" for="r{{ bank }}{{ cust.customer_id }}">
+              <strong>{{ bank }}</strong> — {{ cust.name }} ({{ cust.account_no }})
+            </label>
+          </div>
+        {% endfor %}
+      {% endfor %}
+
+      <button type="submit" class="btn btn-success btn-action">
+        Proceed
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% load static %}
+{% block content %}
+{% block extra_css %}
+<style>
+    /* Navbar professional + Edulink-style */
+    .navbar {
+        background: linear-gradient(to right, #0f2027, #2c5364);
+        padding: 0.2rem 0.2rem;
+        margin-bottom: 90px;
+    }
+
+    .navbar-brand,
+    .navbar-nav .nav-link {
+        color: #fff !important;
+        font-weight: 600;
+    }
+
+    .navbar-brand:hover {
+        color: #ff9800 !important;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .hov:hover {
+        color: #ff9800 !important;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 0px;
+    }
+
+   
+
+    .navbar-brand span {
+        font-size: 1.3rem;
+        font-weight: bold;
+        line-height: 1;
+    }
+
+    /* User block */
+    .user-block {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff !important;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 8px;
+    }
+
+
+    .user-icon {
+        font-size: 1.6rem;
+        margin-right: 6px;
+    }
+
+    .user-text {
+        font-size: 0.95rem;
+        line-height: 1;
+    }
+
+    /* Custom popover menu (Edulink-style) */
+    .custom-popover {
+        position: absolute;
+        top: 60px;
+        right: -9px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        padding: 10px;
+        width: 180px;
+        display: none;
+        z-index: 1050;
+    }
+
+    .custom-popover a {
+        display: block;
+        padding: 8px 10px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .custom-popover a:hover {
+        background: #2c5364;
+        color: #fff;
+    }
+</style>
+{% endblock extra_css %}
+
+<nav class="navbar fixed-top shadow-sm">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="bi bi-currency-rupee"></i>
+            <span>UPay</span>
+        </a>
+
+        <!-- Right: User -->
+<ul class="navbar-nav flex-row align-items-center mb-0">
+{% if request.session.upay_user_id and request.session.bank_app %}
+  <!-- Logged in AND bank linked -->
+  <li class="nav-item position-relative">
+    <div class="user-block hov" id="userDropdownToggle">
+      <i class="bi bi-person-circle user-icon"></i>
+      <span class="user-text">
+        {{ request.session.customer_name|default:"UPay User" }}
+      </span>
+    </div>
+
+    <div class="custom-popover" id="userDropdownMenu">
+        <a href="{% url 'customer_dashboard' %}">My Dashboard</a>
+        <a href="{% url 'my_transaction' %}">My Transaction</a>
+        <a href="{% url 'set_or_change_pin' %}">Settings</a>
+        <a href="{% url 'logout_customer' %}" class="text-danger ">Logout</a>
+    </div>
+  </li>
+
+{% elif request.session.upay_user_id %}
+  <!-- Logged in but NO bank linked -->
+  <li class="nav-item position-relative">
+    <div class="user-block hov" id="userDropdownToggle">
+      <i class="bi bi-person-circle user-icon"></i>
+      <span class="user-text">UPay User</span>
+    </div>
+    <div class="custom-popover" id="userDropdownMenu">
+        <span class="text-muted">No Bank Linked</span>
+        <a href="{% url 'logout_customer' %}" class="text-danger mt-2">Logout</a>
+    </div>
+  </li>
+
+{% else %}
+  <!-- Not logged in -->
+  <li class="nav-item">
+    <a href="{% url 'upay_login' %}" class="nav-link user-block hov">
+      <i class="bi bi-person-circle user-icon"></i>
+      <span class="user-text">Login</span>
+    </a>
+  </li>
+{% endif %}
+</ul>
+
+    </div>
+</nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggle = document.getElementById("userDropdownToggle");
+        const menu = document.getElementById("userDropdownMenu");
+
+        if (toggle && menu) {
+            toggle.addEventListener("click", function () {
+                menu.style.display = menu.style.display === "block" ? "none" : "block";
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener("click", function (e) {
+                if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+                    menu.style.display = "none";
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock content %}

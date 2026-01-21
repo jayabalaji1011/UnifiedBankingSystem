@@ -1,0 +1,62 @@
+{% extends 'aadhar_app/base.html' %}
+{% block title %}Aadhar Home{% endblock %}
+{% block content %}
+{% block extra_css %}
+<style>
+.a-card{
+  background:#fff;
+  border-radius:14px;
+  padding:24px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+.a-title{
+  text-align:center;
+  color:#1f3c88;
+  font-weight:600;
+  margin-bottom:20px;
+}
+.page-pad{padding:0 16px;}
+@media(max-width:576px){
+  .a-card{padding:18px;}
+}
+</style>
+{% endblock %}
+
+
+<div class="container page-pad mt-4">
+ <div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8 col-sm-12">
+   <div class="a-card">
+
+    <h4 class="a-title">Aadhar Search</h4>
+
+    <form method="get" class="row g-2">
+      <div class="col-12 col-sm-8">
+        <input type="text" name="aadhar_no" class="form-control" placeholder="Enter Aadhar Number">
+      </div>
+      <div class="col-12 col-sm-4 d-grid">
+        <button class="btn btn-primary">Search</button>
+      </div>
+    </form>
+
+    {% if aadhar == 'not_found' %}
+      <p class="text-danger text-center mt-3">No Aadhar found</p>
+    {% elif aadhar %}
+      <div class="alert alert-success mt-3 text-center">
+        <a href="{% url 'aadhar_detail' aadhar.pk %}">
+          {{ aadhar.name }} – {{ aadhar.aadhar_no }}
+        </a>
+      </div>
+    {% endif %}
+
+    <div class="d-grid mt-3">
+      <a href="{% url 'aadhar_create' %}" class="btn btn-outline-primary">
+        Create Aadhar
+      </a>
+    </div>
+
+   </div>
+  </div>
+ </div>
+</div>
+{% endblock %}

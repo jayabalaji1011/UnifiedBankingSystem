@@ -1,0 +1,25 @@
+{% extends "digitalbank/base.html" %}
+{% block content %}
+{% block extra_css %}
+<style>
+
+</style>
+{% endblock %}
+<div class="atm-wrapper">
+<div class="atm-card text-center">
+
+<h2 style="color:#22c55e;font-size:28px;">✔ PIN Created</h2>
+
+<div style="font-size:60px; animation:pop 0.5s infinite alternate;">✅</div>
+
+<p>Redirecting to ATM...</p>
+
+</div>
+</div>
+
+<script>
+setTimeout(()=>{window.location.href="{% url 'digitalbank:atm_home' %}"},4000)
+</script>
+
+
+{% endblock %}

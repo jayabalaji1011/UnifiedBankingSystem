@@ -1,0 +1,41 @@
+{% extends "upay/index.html" %}
+{% block content %}
+<style>
+body { background:#0f172a; color:white; }
+.loader{
+  width:80px;height:80px;border:6px solid #333;
+  border-top:6px solid #00ffcc;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:auto;
+}
+@keyframes spin { 100% { transform:rotate(360deg); } }
+.processing-card{
+  margin-top:40%;
+  text-align:center;
+}
+</style>
+
+<div class="processing-card">
+  <div class="loader"></div>
+  <h3 class="mt-4">Processing payment…</h3>
+  <p>Do not close the app</p>
+</div>
+
+<script>
+function checkStatus(){
+  fetch("{% url 'upay_processing_check' %}")
+    .then(res=>res.json())
+    .then(data=>{
+      if(data.status==="SUCCESS"){
+        window.location.href = "{% url 'send_money_success' %}";
+      }
+      else if(data.status==="FAILED"){
+        window.location.href = "{% url 'send_money_failed' %}";
+      }
+    });
+}
+
+setInterval(checkStatus, 1500);  // check every 1.5 sec
+</script>
+{% endblock %}

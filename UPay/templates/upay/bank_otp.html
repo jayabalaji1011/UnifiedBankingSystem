@@ -1,0 +1,120 @@
+{% extends 'upay/index.html' %}
+{% block title %}Verify OTP{% endblock %}
+{% block content %}
+{% block extra_css %}
+<style>
+.container{
+  margin-top: 8% !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+}
+
+
+.card{
+  width:100%;
+  max-width:420px;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.08);
+}
+
+.btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  color:#fff;
+  font-size:16px;
+  font-weight:600;
+  margin-top:10px;
+}
+
+@media(max-width:1023px){
+.card{
+  color:white ! important;
+  background: #2c5364 ! important;  
+  }
+
+.container{
+  margin-top: 50% !important;
+}
+}
+
+.form-message-container { min-height: 24px; text-align: center; margin-bottom: 5px; margin-top: 5px;}
+.form-message { font-weight: 500; }
+.form-message.error { color: #dc3545; }
+.form-message.success { color: #28a745; }
+</style>
+{% endblock extra_css %}
+<div class="container">
+  <div class="card">
+
+    <!-- messages -->
+        <div class="form-message-container">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="form-message {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+
+    <h3 class="d-flex justify-content-center">
+      {% if method == "AADHAAR" %}Aadhar OTP Verification{% else %}Debit Card OTP Verification{% endif %}
+    </h3>
+
+    <p class="text-center">
+      OTP sent to {{ mobile }}
+    </p>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3">
+        <input type="text" name="otp" class="form-control" placeholder="Enter OTP" maxlength="6" required>
+      </div>
+
+      <button type="submit" class="btn btn-success btn-action">Verify OTP</button>
+    </form>
+
+    <!-- RESEND OTP -->
+  <form method="post">
+  {% csrf_token %}
+  <button type="submit" name="resend_otp" class="btn " id="resendBtn">
+    Resend OTP
+  </button>
+</form>
+
+
+
+    {% if method == "DEBIT" %}
+      <p class="text-muted mt-3 text-center">
+        After OTP verification, you will be asked to enter your ATM PIN to complete linking.
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+   // auto focus (mobile feel)
+  setTimeout(focusPin, 400);
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('.form-message.success').forEach(m =>
+      setTimeout(()=>m.style.display='none',2000)
+    );
+    document.querySelectorAll('.form-message.error').forEach(m =>
+      setTimeout(()=>m.style.display='none',4000)
+    );
+  });
+
+   const btn = document.getElementById("resendBtn");
+  if(btn){
+    btn.disabled = true;
+    setTimeout(() => btn.disabled = false, 30000);
+  }
+</script>
+{% endblock %}

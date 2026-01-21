@@ -1,0 +1,57 @@
+{% extends 'upay/index.html' %}
+{% block title %}Select Verification Method{% endblock %}
+{% block content %}
+{% block extra_css %}
+<style>
+.container{
+  margin-top: 15% !important;
+}
+
+@media(max-width:1023px){
+.card{
+  color:white ! important;
+  background: #2c5364 ! important;  
+  }
+
+.container{
+  margin-top: 50% !important;
+}
+
+}
+</style>
+{% endblock extra_css %}
+
+
+<div class="container">
+  <div class="card">
+  
+    <h3 class="d-flex justify-content-center mb-4">Select Verification Method</h3>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="radio" name="method" id="aadhaar" value="AADHAAR" required>
+        <label class="form-check-label" for="aadhaar">
+          Aadhar Verification
+        </label>
+      </div>
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="radio" name="method" id="debit" value="DEBIT" required>
+        <label class="form-check-label" for="debit">
+          Debit Card Verification
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-action mt-3">Next</button>
+    </form>
+  </div>
+</div>
+
+<style>
+  .container { max-width: 480px; margin: 7% auto; }
+  .card { padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+  .btn-action { width: 100%; padding: 12px; font-size: 16px; border-radius: 12px; }
+</style>
+{% endblock %}

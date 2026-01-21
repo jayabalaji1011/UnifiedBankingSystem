@@ -1,0 +1,130 @@
+{% extends 'pan_app/base.html' %}
+{% load static %}
+{% block title %}Verify OTP{% endblock %}
+{% block content %}
+{% block extra_css %}
+<style>
+.p-card{
+  background:#fff;
+  border-radius:14px;
+  padding:24px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+.p-title{
+  text-align:center;
+  color:#1f3c88;
+  font-weight:600;
+  margin-bottom:20px;
+}
+
+.edit-actions{
+  position:absolute;
+  top:8px;
+  right:16px;
+  display:flex;
+  gap:12px;
+}
+.edit-actions button{
+  background:none;
+  border:none;
+  font-size:22px;
+  cursor:pointer;
+  color:#1f3c88;
+}
+.edit-actions button:hover{
+  color:#e63946;
+}
+
+.p-card{position:relative;}
+
+.form-group{margin-bottom:16px;}
+.form-group label{
+  display:block;
+  font-weight:600;
+  margin-bottom:6px;
+}
+.form-group input{
+  width:100%;
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid #ced4da;
+  text-align:center;
+  letter-spacing:4px;
+  font-size:18px;
+}
+.info-box{
+  background:#f8f9fa;
+  padding:12px;
+  border-radius:8px;
+  font-size:14px;
+  margin-bottom:16px;
+}
+@media(max-width:576px){
+  .p-card{padding:18px;}
+}
+</style>
+{% endblock %}
+
+<div class="container py-4">
+ <div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8 col-sm-12">
+   <div class="p-card">
+
+    <div class="edit-actions">
+  <button type="button" id="closeBtn" title="Close">
+    <i class="bi bi-x-lg"></i>
+  </button>
+</div>
+
+    <h4 class="p-title">Verify OTP</h4>
+
+    <div class="info-box text-center">
+      <strong>Aadhar:</strong> {{ aadhar.aadhar_no }} <br>
+      <strong>Mobile:</strong> {{ aadhar.mobile }}
+    </div>
+
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <!-- VERIFY OTP -->
+    <form method="post" action="{% url 'pan_verify_otp' %}">
+     {% csrf_token %}
+     <input type="hidden" name="aadhar_no" value="{{ aadhar.aadhar_no }}">
+     <input type="hidden" name="mobile" value="{{ aadhar.mobile }}">
+
+     <div class="form-group">
+      <label>Enter OTP</label>
+      <input name="otp" maxlength="6" required>
+     </div>
+
+     <div class="text-center mt-4">
+      <button class="btn btn-success px-5">Verify OTP</button>
+     </div>
+    </form>
+
+    <!-- RESEND OTP -->
+    <form method="post" action="{% url 'pan_resend_otp' %}" class="text-center mt-3">
+     {% csrf_token %}
+     <input type="hidden" name="aadhar_no" value="{{ aadhar.aadhar_no }}">
+     <input type="hidden" name="mobile" value="{{ aadhar.mobile }}">
+     <button class="btn btn-link">Resend OTP</button>
+    </form>
+
+   </div>
+  </div>
+ </div>
+</div>
+
+<script>
+const closeBtn = document.getElementById("closeBtn");
+
+closeBtn.onclick = ()=>{
+    window.location.href = "{% url 'pan_create_start' %}";
+};
+
+saveBtn.onclick = ()=>{
+  form.submit();
+};
+</script>
+{% endblock %}

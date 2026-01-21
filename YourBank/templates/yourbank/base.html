@@ -1,0 +1,225 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>
+        {% block title %}
+        YourBank
+        {% endblock title %}
+    </title>
+    <style>
+        .atm-wrapper{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#0f172a;
+}
+
+.atm-card{
+    background:#111827;
+    color:white;
+    width:100%;
+    max-width:420px;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 0 30px rgba(0,255,255,0.3);
+    animation:fadeIn 0.5s ease-in-out;
+}
+
+.atm-title{
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    color:#22d3ee;
+    margin-bottom:10px;
+}
+
+
+.atm-btn{
+    width:100%;
+    padding:12px;
+    background:#22d3ee;
+    border:none;
+    border-radius:12px;
+    color:black;
+    font-weight:bold;
+    font-size:16px;
+    margin-top:10px;
+    transition:0.3s;
+}
+
+.atm-btn:hover{
+    background:#0ea5e9;
+    transform:scale(1.03);
+}
+
+.atm-link{
+    display:block;
+    text-align:center;
+    margin-top:15px;
+    color:#38bdf8;
+    text-decoration:none;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:scale(0.95);}
+    to{opacity:1; transform:scale(1);}
+}
+
+@media(max-width:600px){
+    .atm-card{ margin:15px; }
+}
+
+#atm-message-area{
+    min-height:50px;   /* reserve space even when no message */
+    margin-bottom:2px;
+}
+
+.atm-msg{
+    border-radius:8px;
+    font-size:18px;
+    text-align:center;
+    animation: slideDown .4s ease;
+}
+
+.atm-msg.success{
+    color:#16a34a;
+}
+
+.atm-msg.error{
+    color:#dc2626;
+}
+
+.atm-msg.warning{
+    color:#f59e0b;
+}
+
+/* smooth entry */
+@keyframes slideDown{
+    from{opacity:0; transform:translateY(-10px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+/* fade out animation */
+.fade-out{
+    animation: fadeOut 1s ease forwards;
+}
+
+@keyframes fadeOut{
+    to{opacity:0; transform:translateY(-10px);}
+}
+
+.atm-card{
+    position:relative;
+}
+
+.atm-close{
+    position:absolute;
+    top:10px;
+    right:12px;
+    font-size:18px;
+    color:#ef4444;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+    </style>
+</head>
+
+<body style="background-color: #f0f2f5;">
+
+
+
+
+
+    {% block content %}
+
+
+    
+    {% endblock content %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl, {
+                    placement: 'bottom',
+                    trigger: 'click',
+                    sanitize: false,   // allow HTML buttons inside
+                    html: true
+                });
+            });
+
+            // ✅ Optional: Close popover when clicking outside
+            document.addEventListener('click', function (e) {
+                popoverList.forEach(function (popover) {
+                    if (!popover._element.contains(e.target) && !document.querySelector('.popover')?.contains(e.target)) {
+                        popover.hide();
+                    }
+                });
+            });
+        });
+        
+// Msg 
+setTimeout(function(){
+    document.querySelectorAll(".atm-msg.success").forEach(function(msg){
+        msg.classList.add("fade-out");
+    });
+}, 5000);
+
+
+history.pushState(null, "", location.href);
+window.onpopstate = function(){
+    window.location.href = "{% url 'yourbank:atm_home' %}";
+}
+
+
+
+</script>
+
+<script>
+(function(){
+    // flag to avoid loop
+    let redirecting = false;
+
+    // block back button
+    window.addEventListener("popstate", function(event) {
+        if (!redirecting) {
+            redirecting = true;
+            window.location.href = "{% url 'digitalbank:atm_home' %}";
+        }
+    });
+
+    // prevent swipe back on mobile (optional)
+    let touchStartX = 0;
+    document.addEventListener("touchstart", function(e){
+        touchStartX = e.touches[0].clientX;
+    }, {passive:true});
+
+    document.addEventListener("touchend", function(e){
+        let touchEndX = e.changedTouches[0].clientX;
+        if(touchEndX - touchStartX > 50 && !redirecting){
+            redirecting = true;
+            window.location.href = "{% url 'digitalbank:atm_home' %}";
+        }
+    }, {passive:true});
+
+    // disable multiple tabs trying to back
+    history.pushState(null, "", location.href);
+})();
+</script>
+
+</body>
+
+</html>

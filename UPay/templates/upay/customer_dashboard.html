@@ -1,0 +1,241 @@
+{% extends 'upay/index.html' %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+{% block extra_css %}
+<style>
+
+/* PAGE */
+.dashboard-page{
+  display:flex;
+  justify-content:center;
+  padding:40px 15px;
+  margin-top:4%;
+}
+
+/* MAIN CARD */
+.card{
+  width:100%;
+  max-width:720px;
+  border-radius:24px;
+  padding:28px;
+  box-shadow:0 15px 40px rgba(0,0,0,.08);
+}
+
+@media(max-width:1023px){
+
+
+  .card{
+    max-width:100%;  
+  }
+
+  .dashboard-title{
+    color:white;
+  }
+
+
+   .dashboard-page{
+  margin-top:15%;
+}
+
+
+
+  .bank-card{
+    margin-bottom: 10% ! important;
+  }
+}
+/* Tablet */
+@media(max-width:1024px){
+  .card{ max-width:600px; }
+}
+
+/* Mobile */
+@media(max-width:576px){
+  .card{
+    max-width:100%;
+    padding:20px;
+    border-radius:18px;
+  }
+}
+
+/* HEADER */
+.dashboard-title{
+  font-size:20px;
+  font-weight:600;
+  text-align:center;
+}
+
+/* INFO ROW */
+.info-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 18px;
+  border-radius:16px;
+  margin-bottom:10px;
+  text-decoration:none;
+  color:white;
+  transition:.25s;
+}
+
+.info-row:hover{
+  background:#edf2ff;
+  transform:scale(1.01);
+  color:#000;
+}
+
+/* LEFT */
+.info-left strong{
+  font-size:16px;
+}
+.info-left small{
+  font-size:13px;
+  color:#666;
+}
+
+/* ACTIONS */
+.unlink{
+  font-size:18px;
+  color:red;
+  font-weight:600;
+  text-decoration:none;
+
+}
+
+.arrow{
+  font-size:18px;
+  color:#0d6efd;
+  font-weight:700;
+}
+
+/* BANK CARD */
+.bank-card{
+  background:transparent;  /* :linear-gradient(135deg,#1e3c72,#2a5298) */
+  color:white;
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:20px;
+  box-shadow:0 12px px rgba(0,0,0,.25);
+}
+
+.bank-title{
+  font-size:18px;
+  font-weight:600;
+  margin-bottom:12px;
+}
+
+.bank-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.bank-field{
+  background:rgba(255,255,255,.15);
+  border-radius:12px;
+  padding:12px 14px;
+}
+
+.bank-field span{
+  font-size:12px;
+  color:#dce2ff;
+
+}
+
+
+.bank-field i{
+  font-size:13px;
+}
+
+
+.bank-field strong{
+  font-size:14px;
+}
+
+/* Mobile bank card */
+@media(max-width:600px){
+  .bank-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+</style>
+{% endblock extra_css %}
+
+<div class="dashboard-page">
+
+  <div class="card">
+    <h4 class="dashboard-title mb-2">UPay Account</h4>
+
+    <!-- BANK DETAILS -->
+    {% if bank_linked and bank_customer %}
+    <div class="bank-card">
+
+  <div class="bank-grid">
+
+    <div class="bank-field">
+      <span><i class="fa-solid fa-user"></i></span>
+      <strong>{{ bank_customer.name }}</strong>
+    </div>
+
+    <div class="bank-field">
+      <span><i class="fa-solid fa-phone "></i></span>
+      <strong>{{ bank_customer.mobile }}</strong>
+    </div>
+
+    <div class="bank-field">
+      <span><i class="fa-solid fa-building-columns"></i></span>
+      <strong>{{ bank_name }}</strong>
+    </div>
+
+    <div class="bank-field">
+      <span><i class="fa-solid fa-link"></i></span>
+      <strong style="color:#7CFF8E;">Linked</strong>
+    </div>
+
+  </div>
+</div>
+
+
+    <a href="{% url 'unlink_bank' %}" class="info-row mt-3">
+      <div class="info-left">
+        <strong >Unlink Bank</strong>
+        <small>from UPay</small>
+      </div>
+      <span class="unlink">Unlink</span>
+    </a>
+    {% else %}
+    <div class="info-row">
+      <div class="info-left">
+        <strong>No Bank Linked</strong>
+        <small>Please link a bank</small>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- UPI PIN -->
+    <a href="{% url 'set_or_change_pin' %}" class="info-row">
+      <div class="info-left">
+        <strong>UPI PIN</strong>
+        <small>
+          {% if customer.transaction_pin %}Change PIN{% else %}Set PIN{% endif %}
+        </small>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+
+    <!-- TRANSACTIONS -->
+    <a href="{% url 'my_transaction' %}" class="info-row">
+      <div class="info-left">
+        <strong>Transactions</strong>
+        <small>Payment History</small>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+
+  </div>
+
+</div>
+
+{% endblock %}

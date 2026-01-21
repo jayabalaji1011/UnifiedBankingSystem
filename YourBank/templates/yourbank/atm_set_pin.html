@@ -1,0 +1,37 @@
+{% extends "yourbank/base.html" %}
+{% block content %}
+{% block extra_css %}
+<style>
+.atm-field{
+    margin-bottom:16px;
+}
+
+</style>
+{% endblock %}
+<div class="atm-wrapper">
+<div class="atm-card">
+<a href="{% url 'yourbank:atm_home' %}" class="atm-close">✕</a>
+
+<div class="atm-title">🔑 Set ATM PIN</div>
+
+<div id="atm-message-area">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="atm-msg {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<form method="post">
+{% csrf_token %}
+<div class="atm-field">{{ form.pin1 }}</div>
+<div class="atm-field">{{ form.pin2 }}</div>
+<button class="atm-btn">Create PIN</button>
+</form>
+
+</div>
+</div>
+
+{% endblock %}

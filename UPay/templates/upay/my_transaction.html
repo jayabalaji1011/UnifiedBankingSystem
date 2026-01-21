@@ -1,0 +1,137 @@
+{% extends 'upay/index.html' %}
+{% load static %}
+{% block content %}
+{% block extra_css %}
+<style>
+  .section-title {
+    margin-top: 3rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 0.4rem;
+  }
+
+
+  .container {
+    margin-top: 8%;
+    max-width: 1000px;
+  }
+
+  .section-title {
+      font-size: 2rem;
+    }
+
+    .section-title .btn {
+      font-size: 1.1rem;
+      padding: 4px 8px;
+    }
+
+
+  @media (max-width: 1025px) {
+
+    .container {
+      margin-top: 13%;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+    }
+
+    .section-title .btn {
+      font-size: 1rem;
+      padding: 4px 8px;
+    }
+
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 576px) {
+
+    .container {
+      margin-top: 25%;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+    }
+
+    .section-title .btn {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+    }
+  }
+</style>
+
+{% endblock extra_css %}
+
+<!-- Transactions -->
+<div class="container">
+  <div class="section-title d-flex justify-content-between align-items-center flex-wrap">
+    <span>Transaction History</span>
+    <a href="{% url 'customer_transactions_pdf' customer.customer_id %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-download"></i> Download
+    </a>
+  </div>
+<!-- my_transaction.html / customer_dashboard.html -->
+<div class="table-responsive">
+  <table class="table table-hover table-bordered align-middle text-center">
+    <thead class="table-light">
+      <tr>
+        <th>Date/Time</th>
+        <th>Sender_Acc</th>
+        <th>Receiver_Acc</th>
+        <th>Tnx_Type</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tx in transactions %}
+      <tr>
+        <td>{{ tx.date|date:"d-m-Y/H:i" }}</td>
+    <td>
+  {% if tx.transaction_type == "CREDIT" and tx.sender_bank %}
+      {{ tx.sender_bank }} | {{ tx.sender_mobile }}
+  {% else %}
+      {{ tx.sender_mobile }}
+  {% endif %}
+</td>
+
+<td>
+  {% if tx.transaction_type == "DEBIT" %}
+      {# sender side view #}
+      {% if tx.receiver_bank %}
+          {% if tx.receiver_mobile %}
+              {{ tx.receiver_bank }} | {{ tx.receiver_mobile }}
+          {% else %}
+              {{ tx.receiver_bank }} | ****{{ tx.receiver_account|slice:"-4:" }}
+          {% endif %}
+      {% else %}
+          {% if tx.receiver_mobile %}
+              {{ tx.receiver_mobile }}
+          {% else %}
+              ****{{ tx.receiver_account|slice:"-4:" }}
+          {% endif %}
+      {% endif %}
+  {% else %}
+      {# receiver side view #}
+      {% if tx.receiver_mobile %}
+          {{ tx.receiver_mobile }}
+      {% else %}
+          ****{{ tx.receiver_account|slice:"-4:" }}
+      {% endif %}
+  {% endif %}
+</td>
+
+
+        <td>{{ tx.display_type }}</td>
+        <td>₹ {{ tx.amount }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="text-center">No transactions found</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+</div>
+{% endblock content %}

@@ -1,0 +1,239 @@
+{% extends 'upay/index.html' %}
+{% load static %}
+{% block title %}
+  Transaction PIN
+{% endblock %}
+
+{% block content %}
+{% block extra_css %}
+<style>
+ .container{
+  margin-top: 10% !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+}
+
+  .card {
+  width:100%;
+  max-width:420px;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.08);
+  }
+
+  .btn{
+    margin-top: 5%;
+  }
+
+  
+  @media(max-width:1023px){
+
+  .card{
+    margin-top:40% ! important ; 
+  }
+
+}
+
+ .form-message-container {
+    position: fixed;
+    bottom: 5%;   /* move from top to bottom */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050;
+    width: auto;
+    max-width: 400px;
+    text-align: center;
+}
+
+
+  .form-message {
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-weight: 500;
+    color: #fff;
+    opacity: 1;
+    transition: opacity 0.5s;
+  }
+
+  .form-message.success { background-color: #28a745; }
+  .form-message.error { background-color: #dc3545; }
+
+.real-pin {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 40px;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  caret-color: transparent;
+}
+
+
+.pin-box {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.pin-slot {
+  width: 36px;
+  height: 36px;
+  border-bottom: 3px solid #999;
+  font-size: 22px;
+  font-weight: 600;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.pin-slot.filled {
+  border-color: #2c5364;
+}
+
+.pin-wrapper {
+  position: relative;
+  height: 40px;
+}
+
+
+</style>
+{% endblock %}
+
+<div class="container">
+    <!-- Message popup -->
+    <div class="form-message-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="form-message {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+  <div class="card">
+    <h2 class="d-flex justify-content-center mb-3">
+      {% if customer.transaction_pin %}Change PIN{% else %}Set PIN{% endif %}
+    </h2>
+    <form method="post">
+      {% csrf_token %}
+
+      {% if customer.transaction_pin %}
+      <!-- OLD PIN -->
+      <div class="mb-3">
+  <label class="form-label">Old PIN</label>
+  <div class="pin-wrapper">
+    <input type="password"
+           name="old_pin"
+           id="oldPinInput"
+           class="real-pin"
+           inputmode="numeric"
+           maxlength="6"
+           required>
+
+    <div class="pin-box">
+      <div class="pin-slot"></div>
+      <div class="pin-slot"></div>
+      <div class="pin-slot"></div>
+      <div class="pin-slot"></div>
+      <div class="pin-slot"></div>
+      <div class="pin-slot"></div>
+    </div>
+  </div>
+</div>
+
+      {% endif %}
+
+      <!-- NEW PIN -->
+      <div class="mb-3">
+  <label class="form-label">New PIN</label>
+  <div class="pin-wrapper">
+    <input type="password"
+           name="new_pin"
+           id="newPinInput"
+           class="real-pin"
+           inputmode="numeric"
+           maxlength="6"
+           required>
+
+    <div class="pin-box">
+      <div class="pin-slot"></div>
+      <div class="pin-slot"></div>
+      <div class="pin-slot"></div>
+      <div class="pin-slot"></div>
+      <div class="pin-slot"></div>
+      <div class="pin-slot"></div>
+    </div>
+  </div>
+</div>
+
+
+      <button type="submit" class="btn btn-success w-100">
+        {% if customer.transaction_pin %}Change PIN{% else %}Set PIN{% endif %}
+      </button>
+
+    </form>
+  </div>
+</div>
+
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+  const oldPinInput = document.getElementById('oldPinInput');
+  const oldSlots = oldPinInput ? oldPinInput.parentElement.querySelectorAll('.pin-slot') : [];
+
+  const newPinInput = document.getElementById('newPinInput');
+  const newSlots = newPinInput.parentElement.querySelectorAll('.pin-slot');
+
+  function updateSlots(input, slots) {
+    let val = input.value.replace(/\D/g, '').slice(0,6);
+    input.value = val;
+
+    slots.forEach((slot, i) => {
+      slot.textContent = i < val.length ? '•' : '';
+      slot.classList.toggle('filled', i < val.length);
+    });
+  }
+
+  if(oldPinInput) {
+    oldPinInput.addEventListener('input', () => updateSlots(oldPinInput, oldSlots));
+  }
+
+  newPinInput.addEventListener('input', () => updateSlots(newPinInput, newSlots));
+
+  // auto focus new PIN
+  setTimeout(() => newPinInput.focus(), 400);
+});
+
+
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const successMsgs = document.querySelectorAll('.form-message.success');
+    const errorMsgs = document.querySelectorAll('.form-message.error');
+
+    successMsgs.forEach(msg => {
+      setTimeout(() => {
+        msg.style.transition = 'opacity 0.5s';
+        msg.style.opacity = '0';
+        setTimeout(() => { msg.style.display = 'none'; }, 500);
+      }, 2000);
+    });
+
+    errorMsgs.forEach(msg => {
+      setTimeout(() => {
+        msg.style.transition = 'opacity 0.5s';
+        msg.style.opacity = '0';
+        setTimeout(() => { msg.style.display = 'none'; }, 500);
+      }, 4000);
+    });
+  });
+</script>
+{% endblock %}

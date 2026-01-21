@@ -1,0 +1,302 @@
+{% extends 'upay/index.html' %}
+{% block title %}Verify Bank{% endblock %}
+{% block content %}
+{% block extra_css %}
+<style>
+/* Page */
+.verify-page{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  margin-top: 8%;
+}
+
+/* Card */
+.card{
+  width:100%;
+  max-width:420px;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.08);
+}
+
+/* Titles */
+.verify-title{
+  text-align:center;
+  font-size:22px;
+  font-weight:600;
+}
+
+.verify-sub{
+  text-align:center;
+  color:#777;
+  font-size:14px;
+  margin-bottom:25px;
+}
+
+/* Inputs */
+.input-box{margin-bottom:20px;}
+
+.input-box label{
+  font-weight:600;
+  display:block;
+  margin-bottom:6px;
+}
+
+/* Mask inputs (Aadhaar/Debit) */
+.mask-box{
+  display:flex;
+  align-items:center;
+  border:1.5px solid #ced4da;
+  border-radius:12px;
+  padding:12px 14px;
+  background:#fff;
+  white-space:nowrap;
+}
+
+.mask-text{
+  font-family:monospace;
+  letter-spacing:3px;
+  color:#999;
+}
+
+.mask-input{
+  border:none;
+  outline:none;
+  width:100%;
+  font-size:20px;
+  font-family:monospace;
+  letter-spacing:3px;
+  padding-left:10px;
+  background:transparent;
+}
+
+.mask-box:focus-within{
+  border-color:#0d6efd;
+  box-shadow:0 0 0 2px rgba(13,110,253,.15);
+}
+
+/* Expiry input */
+.expiry-input{
+  width:130px;
+  padding:12px;
+  font-size:18px;
+  border-radius:12px;
+  border:1.5px solid #ced4da;
+  font-family:monospace;
+  text-align:center;
+  letter-spacing:3px;
+}
+
+.expiry-input:focus{
+  border-color:#0d6efd;
+  outline:none;
+  box-shadow:0 0 0 2px rgba(13,110,253,.15);
+}
+
+/* Button */
+.verify-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#0d6efd;
+  color:#fff;
+  font-size:16px;
+  font-weight:600;
+  margin-top:10px;
+}
+
+/* Mobile */
+@media(max-width:480px){
+  .card{padding:20px;}
+  .mask-input{font-size:17px;}
+  .mask-text{font-size:16px;}
+}
+
+
+@media(max-width:1023px){
+
+  .verify-page{
+    margin-top:50% ! important ;
+  }
+
+.card{
+  box-shadow:none;
+  border-radius:0 ;
+  padding:0;
+  border:0 !important;      /* 🔥 removes the Bootstrap card border */
+  outline:none;  
+}
+
+}
+
+.form-message-container {
+  position: fixed;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050;
+
+  width: calc(100% - 30px);   /* 🔥 allow wide messages */
+  max-width: 250px;           /* desktop limit */
+  text-align: center;
+}
+
+.form-message{
+  padding:10px 14px;
+  border-radius:8px;
+  font-weight:500;
+  color:#fff;
+
+  word-wrap: break-word;
+  white-space: normal;        /* 🔥 allow multiline */
+  line-height:1.4;
+}
+
+
+  .form-message.success { background-color: #28a745; }
+  .form-message.error { background-color: #dc3545; }
+</style>
+{% endblock extra_css %}
+<div class="verify-page">
+
+  <div class="card">
+
+      <!-- Message popup -->
+    <div class="form-message-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="form-message {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <h3 class="verify-title">Bank Verification</h3>
+
+    <p class="verify-sub">
+      {% if method == "AADHAAR" %}
+        Enter last 6 digits of your Aadhaar
+      {% else %}
+        Enter last 6 digits of your Debit Card and Expiry
+      {% endif %}
+    </p>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      {% if method == "AADHAAR" %}
+      <!-- Aadhaar -->
+      <div class="input-box">
+        <label>Aadhaar Number</label>
+        <div class="mask-box">
+          <span class="mask-text">XXXX XXXX XX</span>
+          <input type="text" name="last_digits"
+                 class="mask-input"
+                 maxlength="6"
+                 inputmode="numeric"
+                 required>
+        </div>
+        <small>Enter last 6 digits</small>
+      </div>
+
+      {% else %}
+      <!-- Debit Card -->
+      <div class="input-box">
+        <label>Debit Card Number</label>
+        <div class="mask-box">
+          <span class="mask-text">XXXX XX</span>
+          <input type="text" name="last6"
+                 class="mask-input"
+                 maxlength="6"
+                 inputmode="numeric"
+                 required>
+        </div>
+        <small>Enter last 6 digits</small>
+      </div>
+
+      <div class="input-box">
+        <label>Expiry Date</label>
+        <input type="text" name="expiry"
+               class="expiry-input"
+               placeholder="MM/YY"
+               maxlength="5"
+               inputmode="numeric"
+               required>
+      </div>
+      {% endif %}
+
+      <button class="verify-btn">
+        {% if method == "AADHAAR" %}Send OTP{% else %}Verify Debit Info{% endif %}
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+
+<script>
+// Mask input (Aadhaar / Debit last 6 digits)
+document.querySelectorAll('.mask-input').forEach(input=>{
+  input.addEventListener('input',()=>{
+    input.value = input.value.replace(/\D/g,'').slice(0,6);
+  });
+});
+
+// Expiry input MM/YY (slash always visible)
+const expiry = document.querySelector('.expiry-input');
+if(expiry){
+  expiry.addEventListener('input', e=>{
+    let val = e.target.value.replace(/\D/g,'').slice(0,4);
+    if(val.length === 0){
+      e.target.value = "";
+    }else if(val.length <= 2){
+      e.target.value = val + "/";
+    }else{
+      e.target.value = val.slice(0,2) + "/" + val.slice(2);
+    }
+  });
+
+  expiry.addEventListener('keydown', e=>{
+    // Allow proper backspace behavior
+    if(e.key === "Backspace"){
+      let val = expiry.value.replace(/\D/g,'');
+      if(val.length <= 2){
+        e.target.value = val;
+      }else{
+        e.target.value = val.slice(0,2) + "/" + val.slice(2);
+      }
+    }
+  });
+}
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const successMsgs = document.querySelectorAll('.form-message.success');
+    const errorMsgs = document.querySelectorAll('.form-message.error');
+
+    successMsgs.forEach(msg => {
+      setTimeout(() => {
+        msg.style.transition = 'opacity 0.5s';
+        msg.style.opacity = '0';
+        setTimeout(() => { msg.style.display = 'none'; }, 500);
+      }, 2000);
+    });
+
+    errorMsgs.forEach(msg => {
+      setTimeout(() => {
+        msg.style.transition = 'opacity 0.5s';
+        msg.style.opacity = '0';
+        setTimeout(() => { msg.style.display = 'none'; }, 500);
+      }, 4000);
+    });
+  });
+</script>
+
+{% endblock %}

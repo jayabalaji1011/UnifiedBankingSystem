@@ -1,0 +1,101 @@
+{% extends "digitalbank/base.html" %}
+{% block content %}
+{% block extra_css %}
+<style>
+.atm-field{
+    margin-bottom:16px;
+}
+
+</style>
+{% endblock %}
+<div class="atm-wrapper">
+<div class="atm-card">
+
+<div class="atm-title">💳 Insert ATM Card</div>
+<div id="atm-message-area">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="atm-msg {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<form method="post">
+{% csrf_token %}
+
+<div class="atm-field">
+    {{ form.card_no }}
+</div>
+
+<div class="atm-field">
+    {{ form.expiry_date }}
+</div>
+
+<button class="atm-btn">Verify Card</button>
+
+</form>
+
+</div>
+</div>
+<script>
+const expiry = document.getElementById("expiry");
+
+// Default format
+expiry.value = "MM/YY";
+
+// Force cursor start
+expiry.addEventListener("focus", () => {
+    expiry.setSelectionRange(0,0);
+});
+
+expiry.addEventListener("keydown", function(e){
+    if(e.key === "Backspace"){
+        e.preventDefault();
+
+        let pos = this.selectionStart;
+        let val = this.value.split("");
+
+        if(pos === 3) pos = 2; // skip /
+
+        if(pos > 0){
+            val[pos-1] = (pos-1 < 2) ? "M" : "Y";
+            this.value = val.join("");
+            this.setSelectionRange(pos-1, pos-1);
+        }
+    }
+});
+
+expiry.addEventListener("keypress", function(e){
+    if(!/[0-9]/.test(e.key)){
+        e.preventDefault();
+        return;
+    }
+
+    e.preventDefault();
+    let pos = this.selectionStart;
+    let val = this.value.split("");
+
+    if(pos === 2) pos = 3; // skip /
+
+    if(pos < 5){
+        val[pos] = e.key;
+        this.value = val.join("");
+        this.setSelectionRange(pos+1, pos+1);
+    }
+});
+
+// Prevent removing slash
+expiry.addEventListener("input", function(){
+    if(this.value.length !== 5 || this.value[2] !== "/"){
+        this.value = this.value.slice(0,2) + "/" + this.value.slice(3,5);
+    }
+});
+</script>
+
+
+
+
+
+{% endblock %}

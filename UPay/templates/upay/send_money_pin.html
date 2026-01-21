@@ -1,0 +1,189 @@
+{% extends 'upay/index.html' %}
+{% load static %}
+{% block title %}Confirm Payment{% endblock %}
+
+{% block content %}
+<style>
+
+  /* PAGE */
+.container{
+  display:flex;
+  justify-content:center;
+  padding:40px 15px;
+  margin-top:10%;
+}
+
+/* MAIN CARD (desktop default) */
+.card{
+  width:100%;
+  max-width:480px;
+  border-radius:24px;
+  padding:28px 22px;
+  box-shadow:0 15px 40px rgba(0,0,0,.08);
+  text-align:center;
+  color:white;
+}
+
+/* Tablet + below (same as dashboard logic) */
+@media(max-width:1023px){
+  .card{
+    max-width:100%;
+    box-shadow:none;
+    border-radius:0;
+    padding:0;
+    border:0 !important;      /* 🔥 removes the Bootstrap card border */
+    outline:none;  
+  }
+
+   .pin-slot.filled{
+    border-color:#2c5364 ! important;
+    color:#2c5364;
+  }
+
+   .container{
+    padding:20px 15px;        /* app-like spacing */
+    margin-top:25%;
+  }
+
+  .btn-pay { width: 50% !important; padding: 12px; font-size: 16px; border-radius: 12px; }
+}
+
+/* Mobile – re-add soft spacing (same dashboard idea) */
+/* Mobile – APP STYLE (NO CARD LOOK) */
+@media(max-width:576px){
+ .card 
+  { margin-top:30%; }
+
+  .btn-pay { width: 85% !important; padding: 12px; font-size: 16px; border-radius: 12px; }
+}
+
+
+
+  .card h2 { margin-bottom: 15px; }
+  .btn-pay { width: 85%; padding: 12px; font-size: 16px; border-radius: 12px; }
+  .form-message-container { min-height: 24px; text-align: center; margin-bottom: 5px; margin-top: 5px;}
+  .form-message { font-weight: 500; }
+  .form-message.error { color: #dc3545; }
+  .form-message.success { color: #28a745; }
+  @keyframes fadeIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+  @media (max-width: 576px) { .card { margin-top:30%; }
+
+}
+
+  /* ===== PIN INPUT STYLE ONLY ===== */
+
+  /* hide real input */
+  .real-pin{
+    opacity:0;
+    pointer-events:none;
+  }
+
+  /* PIN UI FIX */
+  .pin-box{
+    display:flex;
+    justify-content:center;   
+    gap:20px;               
+    cursor:pointer;
+    max-width:100%;
+  }
+
+  .pin-slot{
+    width:36px;
+    height:30px;
+    border-bottom:3px solid #999;
+    font-size:22px;
+    font-weight:600;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+  }
+
+  .pin-slot.filled{
+    border-color:white;
+    
+  }
+</style>
+
+<div class="container">
+  <div class="card">
+    <h2>Confirm Payment</h2>
+    <p>
+      Pay <strong>₹{{ amount }}</strong> to
+      <strong>{{ receiver.name }}</strong>
+      (<small>{{ recipient_input }}</small>)
+    </p>
+
+    <form method="post" action="{% url 'send_money_pin' customer.customer_id %}">
+      {% csrf_token %}
+
+      <div class="mb-2">
+        <label class="d-flex justify-content-center">Enter PIN</label>
+
+        <!-- REAL INPUT (ONLY ONE) -->
+        <input type="password"
+               name="pin"
+               id="pinInput"
+               class="real-pin"
+               inputmode="numeric"
+               maxlength="6"
+               autocomplete="off"
+               required>
+
+        <!-- UNDERSCORE UI -->
+        <div class="pin-box" onclick="focusPin()">
+          <div class="pin-slot"></div>
+          <div class="pin-slot"></div>
+          <div class="pin-slot"></div>
+          <div class="pin-slot"></div>
+          <div class="pin-slot"></div>
+          <div class="pin-slot"></div>
+        </div>
+
+        <!-- messages -->
+        <div class="form-message-container">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="form-message {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-success btn-pay">Pay Now</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const pinInput = document.getElementById('pinInput');
+  const slots = document.querySelectorAll('.pin-slot');
+
+  function focusPin(){
+    pinInput.focus();
+  }
+
+  pinInput.addEventListener('input', () => {
+    let val = pinInput.value.replace(/\D/g,'').slice(0,6);
+    pinInput.value = val;
+
+    slots.forEach((slot, i) => {
+      slot.textContent = i < val.length ? '•' : '';
+      slot.classList.toggle('filled', i < val.length);
+    });
+  });
+
+  // auto focus (mobile feel)
+  setTimeout(focusPin, 400);
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('.form-message.success').forEach(m =>
+      setTimeout(()=>m.style.display='none',2000)
+    );
+    document.querySelectorAll('.form-message.error').forEach(m =>
+      setTimeout(()=>m.style.display='none',4000)
+    );
+  });
+</script>
+{% endblock %}

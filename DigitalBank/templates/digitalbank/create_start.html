@@ -1,0 +1,119 @@
+{% extends 'digitalbank/index.html' %}
+{% load static %}
+{% block title %}ID Verify{% endblock %}
+{% block content %}
+{% block extra_css %}
+<style>
+
+.container{
+  margin-top:10%;
+}
+
+.p-card{
+  background:#fff;
+  border-radius:14px;
+  padding:24px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+.p-title{
+  text-align:center;
+  color:#1f3c88;
+  font-weight:600;
+  margin-bottom:20px;
+}
+
+.edit-actions{
+  position:absolute;
+  top:8px;
+  right:16px;
+  display:flex;
+  gap:12px;
+}
+.edit-actions button{
+  background:none;
+  border:none;
+  font-size:22px;
+  cursor:pointer;
+  color:#1f3c88;
+}
+.edit-actions button:hover{
+  color:#e63946;
+}
+
+.p-card{position:relative;}
+
+
+.form-group{margin-bottom:16px;}
+.form-group label{
+  display:block;
+  font-weight:600;
+  margin-bottom:6px;
+}
+.form-group input{
+  width:100%;
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid #ced4da;
+}
+@media(max-width:576px){
+  .p-card{padding:18px;}
+}
+</style>
+{% endblock %}
+
+<div class="container margin-center">
+ <div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8 col-sm-12">
+   <div class="p-card">
+
+   <div class="edit-actions">
+  <button type="button" id="closeBtn" title="Close">
+    <i class="bi bi-x-lg"></i>
+  </button>
+</div>
+
+    <h4 class="text-center py-2">Create Account — Verify Aadhar</h4>
+
+
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" id="startForm" action="{% url 'digitalbank:create_customer_start' %}">
+     {% csrf_token %}
+
+     <div class="form-group">
+      <label>Aadhar Number</label>
+      <input name="aadhar_no" placeholder="XXXX XXXX XXXX XXXX" required>
+     </div>
+
+     <div class="form-group">
+      <label>Mobile Number</label>
+      <input name="mobile" required placeholder="9876543210">
+     </div>
+
+     <div class="text-center mt-4">
+      <button class="btn btn-primary px-5">
+        Verify & Send OTP
+      </button>
+     </div>
+    </form>
+
+   </div>
+  </div>
+ </div>
+</div>
+
+<script>
+const closeBtn = document.getElementById("closeBtn");
+
+closeBtn.onclick = ()=>{
+    window.location.href = "{% url 'digitalbank:staff_dashboard' %}";
+};
+
+saveBtn.onclick = ()=>{
+  form.submit();
+};
+</script>
+{% endblock %}
+

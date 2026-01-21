@@ -1,0 +1,106 @@
+{% extends 'digitalbank/index.html' %}
+{% load static %}
+
+{% block content %}
+{% block extra_css %}
+<style>
+.container {
+  margin-top: 5%;
+  max-width: 1000px;
+}
+
+/* Input fields for bank info */
+.readonly-input {
+  background-color: #e9ecef;
+  pointer-events: none;
+  margin-bottom: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container { margin-top: 8%; }
+}
+@media (max-width: 576px) {
+  .container { margin-top: 15%; padding: 10px; }
+  h2, h4 { font-size: 1.1rem; }
+  .readonly-input { font-size: 0.9rem; }
+}
+</style>
+{% endblock extra_css %}
+
+<div class="container">
+  <h2 class="mb-3">Bank Info</h2>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label>Bank Name</label>
+      <input type="text" class="form-control readonly-input" value="{{ bank.name }}" readonly>
+    </div>
+    <div class="col-md-4">
+      <label>Branch</label>
+      <input type="text" class="form-control readonly-input" value="{{ bank.branch }}" readonly>
+    </div>
+    <div class="col-md-4">
+      <label>IFSC</label>
+      <input type="text" class="form-control readonly-input" value="{{ bank.ifsc }}" readonly>
+    </div>
+    <div class="col-md-4">
+      <label>State</label>
+      <input type="text" class="form-control readonly-input" value="{{ bank.state }}" readonly>
+    </div>
+    <div class="col-md-4">
+      <label>Balance</label>
+      <input type="text" class="form-control readonly-input" value="₹ {{ bank.balance }}" readonly>
+    </div>
+    <div class="col-md-4">
+      <label>No. of Customers</label>
+      <input type="text" class="form-control readonly-input" value="{{ customer_count }}" readonly>
+    </div>
+  </div>
+
+  <h4 class="mt-4">Recent 10 Transactions</h4>
+<!-- staff_dashboard.html / bank.html -->
+<div class="table-responsive">
+  <table class="table table-hover table-bordered align-middle text-center">
+    <thead class="table-light">
+      <tr>
+        <th>Date/Time</th>
+        <th>Sender_Acc</th>
+        <th>Receiver_Acc</th>
+        <th>Tnx_Type</th>
+        <th>Amount</th>
+        <th>Previous_Balance</th>
+        <th>Current_Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in transactions %}
+      <tr>
+        <td>{{ t.date|date:"d-m-Y H:i" }}</td>
+               <td>
+  {% if t.transaction_type == "CREDIT" and t.sender_bank %}
+      {{ t.sender_bank }} | {{ t.sender_account }}
+  {% else %}
+      {{ t.sender_account }}
+  {% endif %}
+</td>
+
+<td>
+  {% if t.transaction_type == "CREDIT" and t.sender_bank %}
+      {{ t.receiver_bank }} | {{ t.receiver_account }}
+  {% else %}
+      {{ t.receiver_account }}
+  {% endif %}
+</td>
+        <td>{{ t.display_type }}</td>
+        <td>₹ {{ t.amount }}</td>
+        <td>₹ {{ t.balance_before }}</td>
+        <td>₹ {{ t.balance_after }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="text-center">No transactions found</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
+{% endblock content %}

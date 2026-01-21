@@ -1,0 +1,152 @@
+{% extends 'pan_app/base.html' %}
+{% load static %}
+{% block title %}PAN Detail{% endblock %}
+{% block content %}
+{% block extra_css %}
+<style>
+
+.p-card{
+  background:#fff;
+  border-radius:14px;
+  padding:24px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+  position:relative;
+}
+
+.action-icons{
+  position:absolute;
+  top:14px;
+  right:14px;
+  display:flex;
+  gap:10px;
+}
+
+.action-icons a{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f1f3f5;
+  color:#333;
+  text-decoration:none;
+}
+
+.action-icons .edit:hover{
+  color:white;
+  background:blue;
+}
+.action-icons .close:hover{
+  color:white;
+  background:red;
+}
+
+.p-title{
+  text-align:center;
+  color:#1f3c88;
+  font-weight:600;
+  margin-bottom:16px;
+}
+
+.profile-wrap{
+  display:flex;
+  justify-content:center;
+  margin-bottom:20px;
+}
+.profile-img{
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  object-fit:cover;
+  border:4px solid #e9ecef;
+}
+.form-group{margin-bottom:14px;}
+.form-group label{
+  font-weight:600;
+  display:block;
+  margin-bottom:4px;
+}
+
+/* Value styled like input */
+.field-value{
+  width:100%;
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid #ced4da;
+  background:#f8f9fa;
+  font-size:15px;
+}
+
+
+@media(max-width:576px){
+  .p-card{padding:18px;}
+}
+</style>
+{% endblock %}
+
+<div class="container py-4">
+ <div class="row justify-content-center">
+  <div class="col-lg-8 col-md-10 col-sm-12">
+   <div class="p-card">
+    <div class="action-icons">
+  <!-- EDIT -->
+  <a href="{% url 'pan_edit' pan.pk %}" title="Edit" class="edit">
+    <i class="bi bi-pencil"></i>
+  </a>
+
+  <!-- CLOSE / HOME -->
+  <a href="{% url 'pan_home' %}" title="Close" class="close">
+    <i class="bi bi-x-lg"></i>
+  </a>
+</div>
+
+
+    <h4 class="p-title">PAN Details</h4>
+
+    {% if pan.photo %}
+    <div class="profile-wrap">
+      <img src="{{ pan.photo.url }}" class="profile-img">
+    </div>
+    {% endif %}
+
+    <div class="row">
+      <div class="col-md-6 form-group">
+        <label>PAN No</label>
+        <div class="field-value">{{ pan.pan_no }}</div>
+      </div>
+      <div class="col-md-6 form-group">
+        <label>Name</label>
+        <div class="field-value">{{ pan.name }}</div>
+      </div>
+      <div class="col-md-6 form-group">
+        <label>Father Name</label>
+        <div class="field-value">{{ pan.father_name }}</div>
+      </div>
+      <div class="col-md-6 form-group">
+        <label>DOB</label>
+        <div class="field-value">{{ pan.dob }}</div>
+      </div>
+      <div class="col-md-6 form-group">
+        <label>Gender</label>
+        <div class="field-value">{{ pan.gender }}</div>
+      </div>
+      <div class="col-md-6 form-group">
+        <label>Mobile</label>
+        <div class="field-value">{{ pan.mobile }}</div>
+      </div>
+      <div class="col-12 form-group">
+        <label>Address</label>
+        <div class="field-value">{{ pan.address }}</div>
+      </div>
+      <div class="col-12 form-group">
+        <label>Aadhar No</label>
+        <div class="field-value">{{ pan.aadhar.aadhar_no }}</div>
+      </div>
+    </div>
+
+   </div>
+  </div>
+ </div>
+</div>
+{% endblock %}

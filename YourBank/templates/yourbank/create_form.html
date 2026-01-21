@@ -1,0 +1,299 @@
+  {% extends 'yourbank/index.html' %}
+  {% load static %}
+  {% block title %}Create Account{% endblock %}
+  {% block content %}
+  {% block extra_css %}
+  <style>
+
+  .container{
+    margin-top:7%;
+  }
+
+  /* ===== Card ===== */
+  .a-card{
+    background:#fff;
+    border-radius:14px;
+    padding:24px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+  }
+  .a-title{
+    text-align:center;
+    color:#1f3c88;
+    font-weight:600;
+    margin-bottom:10px;
+  }
+
+  .edit-actions{
+    position:absolute;
+    top:8px;
+    right:16px;
+    display:flex;
+    gap:12px;
+  }
+  .edit-actions button{
+    background:none;
+    border:none;
+    font-size:22px;
+    cursor:pointer;
+    color:#1f3c88;
+  }
+  .edit-actions button:hover{
+    color:#e63946;
+  }
+
+  .a-card{
+    position: relative;   /* VERY IMPORTANT */
+  }
+
+
+  /* ===== Profile Images ===== */
+  .profile-row{
+    display:flex;
+    justify-content:center;
+    gap:24px;
+    margin:18px 0 24px;
+    flex-wrap:wrap;
+  }
+  .profile-box{
+    text-align:center;
+  }
+  .profile-img{
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid #e9ecef;
+  }
+  .profile-label{
+    font-size:14px;
+    font-weight:600;
+    margin-top:6px;
+    color:#555;
+  }
+
+  /* ===== Readonly Fields ===== */
+  .form-group{margin-bottom:16px;}
+  .form-group label{
+    display:block;
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .field{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid #ced4da;
+    background:#f8f9fa;
+    font-size:15px;
+  }
+
+  .field-value select,
+  .field-value input {
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid #ced4da;
+    background:#fff;
+    font-size:15px;
+  }
+
+  /* ===== Camera ===== */
+  video, canvas{
+    width:100%;
+    max-height:260px;
+    border-radius:10px;
+    background:#000;
+  }
+  #snap{display:none;}
+
+  /* ===== Mobile ===== */
+  @media(max-width:576px){
+    .a-card{padding:18px;}
+  }
+  </style>
+  {% endblock %}
+
+  <div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 col-sm-12">
+    <div class="a-card">
+
+      <div class="edit-actions">
+    <button type="button" id="closeBtn" title="Close">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+      <h4 class="a-title">Create Account</h4>
+
+      <!-- PROFILE IMAGE -->
+      <div class="profile-row" id="imageRow">
+        {% if aadhar.photo %}
+        <div class="profile-box" id="oldBox">
+          <img src="{{ aadhar.photo.url }}" class="profile-img" id="oldPhoto">
+          <div class="profile-label">Current Photo</div>
+        </div>
+        {% endif %}
+      </div>
+
+      <form method="post" enctype="multipart/form-data" id="createForm" action="{% url 'yourbank:customer_create_form' %}">
+      {% csrf_token %}
+      
+      <input type="hidden" name="photo_data" id="photo_data">
+
+
+      <!-- READONLY DATA -->
+<div class="row">
+
+  <!-- Name + Aadhar -->
+  <div class="col-md-6 form-group">
+    <label>Verified Aadhar</label>
+    <div class="field">{{ aadhar.name }} – {{ aadhar.aadhar_no }}</div>
+
+    <input type="hidden" name="name" value="{{ aadhar.name }}">
+  </div>
+
+   <!-- Bank -->
+  <div class="col-md-6 form-group">
+    <label>Bank</label>
+    <div class="field-value">{{ form.bank }}</div>
+  </div>
+
+  <!-- Account Type -->
+  <div class="col-md-6 form-group">
+    <label>Account Type</label>
+    <div class="field-value">{{ form.account_type }}</div>
+  </div>
+
+  <!-- Deposit -->
+  <div class="col-md-6 form-group">
+    <label>Deposit Amount</label>
+    <div class="field-value">{{ form.balance }}</div>
+  </div>
+
+  <!-- Father -->
+  <div class="col-md-6 form-group">
+    <label>Father Name</label>
+    <div class="field">{{ aadhar.father_name }}</div>
+    <input type="hidden" name="father_name" value="{{ aadhar.father_name }}">
+  </div>
+
+  <!-- DOB -->
+  <div class="col-md-6 form-group">
+    <label>DOB</label>
+    <div class="field">{{ aadhar.dob }}</div>
+    <input type="hidden" name="dob" value="{{ aadhar.dob|date:'Y-m-d' }}">
+  </div>
+
+  <!-- Gender -->
+  <div class="col-md-6 form-group">
+    <label>Gender</label>
+    <div class="field">{{ aadhar.gender }}</div>
+    <input type="hidden" name="gender" value="{{ aadhar.gender }}">
+  </div>
+
+  <!-- Mobile -->
+  <div class="col-md-6 form-group">
+    <label>Mobile</label>
+    <div class="field">{{ aadhar.mobile }}</div>
+    <input type="hidden" name="mobile" value="{{ aadhar.mobile }}">
+  </div>
+
+  <!-- Address (ONLY EDITABLE FIELD) -->
+  <div class="col-md-12 form-group">
+    <label>Address</label>
+    <div class="field">{{ aadhar.address }}</div>
+    <input type="hidden" name="address" value="{{ aadhar.address }}">
+  </div>
+
+</div>
+
+
+      
+
+      <!-- CAMERA -->
+      <label class="fw-bold mb-2">Take Photo (Optional)</label>
+      <video id="video" autoplay></video>
+      <canvas id="canvas" style="display:none;"></canvas>
+
+      <div class="mt-2">
+        <button type="button" id="toggleCam" class="btn btn-outline-secondary btn-sm">
+          Start Camera
+        </button>
+        <button type="button" id="snap" class="btn btn-primary btn-sm">
+          Capture
+        </button>
+      </div>
+
+      <div class="text-center mt-4">
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </div>
+      </form>
+
+    </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+  let stream=null;
+  const video=document.getElementById('video');
+  const canvas=document.getElementById('canvas');
+  const photo_data=document.getElementById('photo_data');
+  const snap=document.getElementById('snap');
+  const toggleCam=document.getElementById('toggleCam');
+  const imageRow=document.getElementById('imageRow');
+
+  video.style.display="none";
+
+  toggleCam.onclick=async()=>{
+  if(!stream){
+    stream=await navigator.mediaDevices.getUserMedia({video:true});
+    video.srcObject=stream;
+    video.onloadedmetadata=()=>video.play();
+    video.style.display="block";
+    snap.style.display="inline-block";
+    toggleCam.innerText="Stop Camera";
+  }else{
+    stream.getTracks().forEach(t=>t.stop());
+    stream=null;
+    video.style.display="none";
+    snap.style.display="none";
+    toggleCam.innerText="Start Camera";
+  }
+  }
+
+  snap.onclick=()=>{
+  if(!stream) return;
+  canvas.width=video.videoWidth;
+  canvas.height=video.videoHeight;
+  canvas.getContext("2d").drawImage(video,0,0);
+  const data=canvas.toDataURL("image/png");
+  photo_data.value=data;
+
+  // Remove existing new preview if any
+  const oldPreview=document.getElementById('newBox');
+  if(oldPreview) oldPreview.remove();
+
+  // Add new image NEXT to old
+  imageRow.insertAdjacentHTML("beforeend", `
+    <div class="profile-box" id="newBox">
+      <img src="${data}" class="profile-img">
+      <div class="profile-label">New Photo</div>
+    </div>
+  `);
+  }
+
+  const closeBtn = document.getElementById("closeBtn");
+
+  closeBtn.onclick = ()=>{
+      window.location.href = "{% url 'yourbank:staff_dashboard' %}";
+  };
+
+  saveBtn.onclick = ()=>{
+    form.submit();
+  };
+
+  </script>
+
+  {% endblock %}

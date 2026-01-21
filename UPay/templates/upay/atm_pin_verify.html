@@ -1,0 +1,26 @@
+{% extends 'upay/index.html' %}
+{% block title %}Enter ATM PIN{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+  <div class="card">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <h3 class="d-flex justify-content-center">ATM PIN Verification</h3>
+    <p class="text-center">Enter your debit card ATM PIN to complete linking.</p>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3">
+        <input type="password" name="atm_pin" class="form-control" placeholder="6-digit PIN" maxlength="6" required>
+      </div>
+
+      <button type="submit" class="btn btn-success btn-action">Verify PIN</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
