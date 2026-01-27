@@ -97,6 +97,207 @@
   .card{
     box-shadow:none;
     border:0 !important;
+    outline:none;
+  }
+
+  /* container spacing for mobile */
+  .container{
+    margin-top: 20%;
+  }
+
+  /* App-style row for Check Balance only */
+  .balance-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 16px;
+    border-radius:12px;
+    margin-bottom:12px; /* gap between Send Money & Check Balance */
+    cursor:pointer;
+    transition:0.25s;
+    margin-top:90%;
+    color:#2c5364;
+  }
+  .balance-row:hover{ background:#2c5364; color:white;}
+  .balance-row span.icon{ font-size:18px; margin-right:10px; color:#2c5364; }
+  .balance-row strong{ font-size:18px; }
+  .balance-row .arrow{ font-size:18px; color:#2c5364; font-weight:700; }
+
+  /* add extra gap above balance-row to separate from Send Money */
+  .send-card{
+    margin-bottom:20px; /* mobile only */
+  }
+}
+
+/* hide mobile Check Balance row on desktop */
+@media(min-width:1024px){
+  .balance-row{
+    display:none !important;
+  }
+}
+</style>
+
+<div class="container">
+
+  <!-- Message popup -->
+  <div class="form-message-container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="form-message {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  {% if balance %}
+  <div class="card mt-3 text-center">
+    <h4>Your Bank Balance</h4>
+    <h2 style="color:green;">₹ {{ balance }}</h2>
+  </div>
+
+{% else %}
+<!-- ❌ HIDE ALL OTHER CARDS WHEN BALANCE EXISTS -->
+
+
+  {% if bank_linked %}
+    <!-- Send Money Card (unchanged for all screens) -->
+    <div class="card send-card">
+      <h2 class="d-flex justify-content-center">Send Money</h2>
+      <form method="POST" action="{% url 'send_money' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label>Receiver Account / Mobile</label>
+          <input type="text" name="recipient" class="form-control" placeholder="Enter account or mobile" required>
+        </div>
+        <div class="mb-3">
+          <label>Amount</label>
+          <input type="number" step="0.01" name="amount" class="form-control" placeholder="₹0.00" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-action">Proceed</button>
+      </form>
+    </div>
+
+    <!-- Check Balance Row for mobile/tablet -->
+    <div class="balance-row" onclick="document.getElementById('balancePinPopup').style.display='flex'">
+      <span class="icon"><i class="fa-solid fa-bank"></i></span>
+      <strong>Check Bank Balance</strong>
+      <span class="arrow">›</span>
+    </div>
+
+    <!-- Check Balance Card (desktop only) -->
+    <div class="card balance-card">
+      <h3 class="d-flex justify-content-center">Check Bank Balance</h3>
+      <button class="btn btn-success btn-action" onclick="document.getElementById('balancePinPopup').style.display='flex'">Check Balance</button>
+    </div>
+
+    {% if not bank_customer %}
+      <div class="card send-card mt-3">
+        <p class="text-danger text-center">Bank customer not found. Some actions may fail.</p>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <!-- Add Bank Card (unchanged for all screens) -->
+    <div class="card send-card">
+      <h3 class="d-flex justify-content-center">No Bank Linked!</h3>
+      <a href="{% url 'add_bank' %}" class="btn btn-success btn-action">Add Bank</a>
+    </div>
+  {% endif %}   <!-- end bank_linked -->
+  {% endif %}   <!-- end balance else -->
+
+
+
+</div>
+
+<!-- Check Balance PIN Popup -->
+<div class="popup-bg" id="balancePinPopup">
+  <div class="popup-box">
+    <h4>Enter PIN to Check Balance</h4>
+    <form method="post" action="{% url 'check_balance' %}">
+      {% csrf_token %}
+      <input type="password" name="pin" class="form-control mt-2" placeholder="PIN" required>
+      <button type="submit" class="btn btn-success btn-action mt-2">Check Balance</button>
+      <button type="button" class="btn btn-secondary btn-action mt-2" onclick="closeBalancePinPopup()">Close</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function closeBalancePinPopup() { document.getElementById('balancePinPopup').style.display='none'; }
+
+{% if check_pin_popup %} document.getElementById('balancePinPopup').style.display='flex'; {% endif %}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const successMsgs = document.querySelectorAll('.form-message.success');
+  const errorMsgs = document.querySelectorAll('.form-message.error');
+  successMsgs.forEach(msg => setTimeout(() => { msg.style.opacity = '0'; setTimeout(()=>msg.style.display='none',500); }, 2000));
+  errorMsgs.forEach(msg => setTimeout(() => { msg.style.opacity = '0'; setTimeout(()=>msg.style.display='none',500); }, 4000));
+});
+</script>
+{% endblock %}}
+
+/* BUTTONS */
+.btn-action{
+  width:100%;
+  padding:12px;
+  font-size:15px;
+  border-radius:14px;
+  margin-top:10px;
+}
+
+/* MESSAGE */
+.form-message-container{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:9999;
+  max-width:90%;
+}
+
+.form-message{
+  padding:8px 14px;
+  border-radius:10px;
+  color:#fff;
+  font-weight:500;
+  text-align:center;
+}
+
+.form-message.success{ background:#28a745; }
+.form-message.error{ background:#dc3545; }
+
+/* POPUP */
+.popup-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+.popup-box{
+  background:#fff;
+  padding:18px;
+  width:90%;
+  max-width:360px;
+  border-radius:16px;
+  text-align:center;
+}
+
+/* ===== MOBILE + TABLET CHECK BALANCE STYLE ===== */
+@media(max-width:1023px){
+  /* hide desktop Check Balance card */
+  .balance-card{
+    display:none !important;
+  }
+
+  /* optional: make all cards flat for mobile */
+  .card{
+    box-shadow:none;
+    border:0 !important;
     outline:none;  
   }
 
