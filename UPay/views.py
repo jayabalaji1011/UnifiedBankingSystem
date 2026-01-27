@@ -212,7 +212,7 @@ def get_current_customer(request):
 
 
 def home(request):
-    # Get logged-in UPay user
+def home(request):
     user_id = request.session.get("upay_user_id")
     if not user_id:
         return redirect("upay_login")
@@ -220,21 +220,18 @@ def home(request):
     user = get_object_or_404(UPayUser, id=user_id)
 
     bank_app = request.session.get("bank_app")
-    customer_id = request.session.get("customer_id")
+    customer_id = request.session.get("customer_id")  # ✅ fixed
     balance = request.session.pop("balance_check_result", None)
 
     # Determine bank name
     bank_name = None
-    if bank_app:
-        if bank_app == "DigitalBank":
-            bank_name = "Digital Bank"
-        elif bank_app == "YourBank":
-            bank_name = "Your Bank"
+    if bank_app == "DigitalBank":
+        bank_name = "Digital Bank"
+    elif bank_app == "YourBank":
+        bank_name = "Your Bank"
 
-    # Bank linked status
     bank_linked = True if bank_app and customer_id else False
 
-    # Optional: get customer object if bank linked
     bank_customer = None
     if bank_linked:
         if bank_app == "DigitalBank":
@@ -248,8 +245,9 @@ def home(request):
         "bank_linked": bank_linked,
         "bank_customer": bank_customer,
         "balance": balance,
+        "check_pin_popup": False,
         "show_balance_popup": True if balance else False,
-        "show_navbar": True
+        "show_navbar": True,
     })
 
 
@@ -988,12 +986,16 @@ def check_balance(request):
 
     if request.method == "POST":
         pin = request.POST.get("pin")
+
         if not check_password(pin, customer.transaction_pin):
-            request.session["pin_error"] = "Incorrect PIN!"
             messages.error(request, "Incorrect PIN!")
             return redirect("home")
+
+        # ✅ store balance in session
         request.session["balance_check_result"] = str(customer.balance)
+        messages.success(request, "Balance fetched successfully")
         return redirect("home")
+
     return redirect("home")
 
 
