@@ -331,17 +331,17 @@
     <span class="atm-status-badge atm-blocked">ACCOUNT OFF</span>
 
 {% elif customer.atmcard.is_expired %}
-    <a href="{% url 'digitalbank:atm_process' customer.pk 'renew' %}"
+    <a href="{% url 'yourbank:atm_process' customer.pk 'renew' %}"
        class="atm-status-badge atm-renew">RENEW</a>
 
 {% elif not customer.atmcard.is_active %}
-    <a href="{% url 'digitalbank:enable_atm' customer.pk %}"
+    <a href="{% url 'yourbank:enable_atm' customer.pk %}"
        class="atm-status-badge atm-blocked">BLOCKED</a>
-    <a href="{% url 'digitalbank:atm_process' customer.pk 'renew' %}"
+    <a href="{% url 'yourbank:atm_process' customer.pk 'renew' %}"
        class="atm-status-badge atm-renew">RENEW</a>
 
 {% else %}
-    <a href="{% url 'digitalbank:block_atm' customer.pk %}"
+    <a href="{% url 'yourbank:block_atm' customer.pk %}"
        class="atm-status-badge atm-active">ACTIVE</a>
 {% endif %}
 
