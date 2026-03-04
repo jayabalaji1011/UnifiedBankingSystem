@@ -52,7 +52,7 @@ The system is divided into five Django apps:
 - OTP-based authentication
 - UPI PIN validation
 - ATM PIN protection
-- Role-based access (Admin / Staff / Customer)
+- Aadhar and Depit-Card Verification 
 
 ---
 
