@@ -11,8 +11,8 @@ The system is divided into five Django apps:
 
 - **Aadhaar** – Stores and verifies user identity details  
 - **PAN** – PAN creation with Aadhaar verification and 18+ age validation  
-- **DigitalBank** – Core banking operations handled by staff  
-- **YourBank** – Customer account management  
+- **DigitalBank** – Core banking operations handled by staff and Customer account management 
+- **YourBank** – Core banking operations handled by staff and Customer account management  
 - **UPay** – UPI-based digital payment system  
 
 ---
